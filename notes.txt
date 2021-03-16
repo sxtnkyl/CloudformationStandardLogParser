@@ -1,0 +1,38 @@
+-aws create credentials profile
+
+-connect to aws toolkit 
+https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/connect.html
+
+-set global credentials file
+-set global config file
+https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/global-config-object.html
+
+
+// AUTOMATED LOG PARSING
+//scheduled run time - every 3 days
+// aws-sdk
+// pulls logs from S3 log bucket into converting folder
+  //https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#listObjects-property
+
+// unzip- convert to txt
+// fix log format- parse txt into array of objects
+  //https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html
+
+//reduce objects by year > month > day > common c-ip
+
+//sort out bots by day
+
+// deletes all from S3 bucket > 
+  //https://docs.aws.amazon.com/AmazonS3/latest/user-guide/delete-objects.html
+  //https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+NEW LAMBDA CENTRALIZED method
+//2 independent parts
+
+//1. AWS Eventbridge runs scheduled event; Lambda converts gz files to json format, store in processed bucket, delete processed gz files
+////folder structure year > month
+//2.AWS Athena to query processed logs/create tables; AWS ElastiSearch(Kibana) for visual graphs
+////https://docs.aws.amazon.com/athena/latest/ug/cloudfront-logs.html
