@@ -3,7 +3,7 @@ const fs = require("fs");
 const p = require("path");
 const zlib = require("zlib");
 require("dotenv").config();
-const format = require("./formats");
+const format = require("./formatAndPlace");
 
 const s3 = new AWS.S3({
   apiVersion: "2006-03-01",
@@ -28,7 +28,7 @@ function getBucketLogs() {
               return;
             }
             if (result) {
-              fs.writeFile(`./converting/${str}.txt`, result);
+              fs.writeFileSync(`./converting/${str}.txt`, result);
             }
           });
         } catch (error) {
@@ -41,7 +41,7 @@ function getBucketLogs() {
   return new Promise((res, rej) => {
     const listParams = {
       Bucket: "tailswaglogs",
-      MaxKeys: 2, //temp small num for tests, change later to grab all files
+      MaxKeys: 6, //temp small num for tests, change later to grab all files
     };
     const keys = [];
 
@@ -92,8 +92,9 @@ function runConvertAndCondenseLogs() {
 
 //TODO: check if bucketCount = fileWriteCount, get missed files
 
-async function run() {
-  await getBucketLogs();
-  await runConvertAndCondenseLogs("./converting");
-}
-run();
+// async function run() {
+//   await getBucketLogs();
+//   await runConvertAndCondenseLogs("./converting");
+// }
+// run();
+runConvertAndCondenseLogs("./converting");

@@ -101,7 +101,10 @@ function formatSingleFile(folder, fileName) {
 
     checkFolderPath(year, month, day);
     fs.writeFileSync(
-      `./${year}/${month}/${day}/${fileName}.json`,
+      `./${year}/${month}/${day}/${fileName.substr(
+        0,
+        fileName.length - 4
+      )}.json`,
       JSON.stringify(newJSON)
     );
   }
