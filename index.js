@@ -14,12 +14,36 @@ const s3 = new AWS.S3({
 
 //makes a list of all files in a bucket, gets each file, then makes a txt file for each file in "./converting";
 function getBucketLogs() {
+  const listParams = {
+    Bucket: "tailswaglogs",
+    MaxKeys: 1, //temp small num for tests, change later to grab all files
+  };
+  const keys = [];
+
+  //listObjects to get keys
+  s3.listObjects(listParams, (err, data) => {
+    if (err) console.log("IM AN ERROR", err);
+    if (data) {
+      let d = data; //data = array of objects
+      d.Contents.forEach((element) => {
+        keys.push(element.Key);
+      });
+      keys.forEach((key) => {
+        let getParams = {
+          Bucket: "tailswaglogs",
+          Key: key,
+        };
+        getKeyObject(getParams);
+      });
+    }
+  });
+
   function getKeyObject(getParams) {
     s3.getObject(getParams, (err, data) => {
       if (err) console.log("IM AN ERROR", err);
       if (data) {
         try {
-          let str = data.ETag.substr(1, data.ETag.length - 2); //make a new file name
+          let str = data.ETag; //make a new file name
           //unzip the Buffer data
           zlib.unzip(data.Body, function (err, result) {
             if (err) {
@@ -28,7 +52,11 @@ function getBucketLogs() {
               return;
             }
             if (result) {
-              fs.writeFileSync(`./converting/${str}.txt`, result);
+              //format buffer here, write as JSON
+              //convertCondense one at a time
+              let formattedJson = format.formatSingleFile(result);
+              console.log("before placing: ", formattedJson);
+              format.placeFormattedJson(formattedJson, str);
             }
           });
         } catch (error) {
@@ -37,64 +65,8 @@ function getBucketLogs() {
       }
     });
   }
-
-  return new Promise((res, rej) => {
-    const listParams = {
-      Bucket: "tailswaglogs",
-      MaxKeys: 6, //temp small num for tests, change later to grab all files
-    };
-    const keys = [];
-
-    //listObjects to get keys
-    s3.listObjects(listParams, (err, data) => {
-      if (err) console.log("IM AN ERROR", err);
-      if (data) {
-        let d = data; //data = array of objects
-        d.Contents.forEach((element) => {
-          keys.push(element.Key);
-        });
-        keys.forEach((key) => {
-          let getParams = {
-            Bucket: "tailswaglogs",
-            Key: key,
-          };
-          getKeyObject(getParams);
-        });
-      }
-    });
-    res();
-  });
-}
-
-//pass folder to convert("./converting"), if folder has files attempts to convert them to json with formatter
-function runConvertAndCondenseLogs() {
-  //checks if file is of extension .txt, converts and writes a JSON to file
-  function makeSingleFile(folder, file) {
-    if (p.extname(folder + "/" + file) === ".txt") {
-      format.formatSingleFile(folder, file);
-    }
-  }
-
-  return new Promise((res, rej) => {
-    //https://nodejs.org/api/fs.html#fs_fs_readdir_path_options_callback
-    //https://nodejs.org/api/path.html#path_path_extname_path
-    fs.readdir(process.env.CONVERTPATH, (err, files) => {
-      if (err) console.error(err);
-      if (files) {
-        files.forEach((file) => {
-          makeSingleFile(process.env.CONVERTPATH, file);
-        });
-      }
-    });
-    res();
-  });
 }
 
 //TODO: check if bucketCount = fileWriteCount, get missed files
 
-// async function run() {
-//   await getBucketLogs();
-//   await runConvertAndCondenseLogs("./converting");
-// }
-// run();
-runConvertAndCondenseLogs("./converting");
+getBucketLogs();
