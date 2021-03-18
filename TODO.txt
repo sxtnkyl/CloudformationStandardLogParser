@@ -1,0 +1,17 @@
+### Probably
+
+* Add additional arg to delete logs downloaded
+* Add arg to auto filterFolder
+* Add arg to change key to sort objects by (rather than c-ip)
+* Tweak filterFolder to sort all folders within a year or month folder
+
+### Maybe
+
+* Use a flags library for accepting command line args
+* Accept piped-in input from command line
+* Add arg for getting files by place in bucket, rather than starting from oldest file 
+
+* create a lambda centered method
+  * 2 independent parts
+  * AWS Eventbridge runs scheduled event; Lambda converts gz files to json format, store in processed bucket, delete processed gz files
+  * AWS Athena to query processed logs/create tables; AWS ElastiSearch(Kibana) for visual graphs

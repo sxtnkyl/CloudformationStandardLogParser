@@ -8,13 +8,13 @@ and create two compiled jsons (bots and unique viewers).
 
 ### Setup
 
--AWS create credentials profile
--Connect to aws toolkit 
+* AWS create credentials profile
+* Connect to aws toolkit 
   *https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/connect.html*
--Set global credentials file
--Set global config file
+* Set global credentials file
+* Set global config file
   *https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/global-config-object.html*
--Dotenv file should contain KEYID, SECRET, REGION, BUCKET  
+* Dotenv file should contain KEYID, SECRET, REGION, BUCKET  
 
 ### Javascript
 
@@ -25,7 +25,7 @@ to download from your S3 bucket, defined in dotenv. Starts by oldest file in the
 
 *NOTE: Bucket must not have files nested in folders*
 
-```bash
+```sh
 node index.js 6
 ```
 
@@ -35,6 +35,6 @@ Optional usage- takes a folder of one day and organizes logs from bots from uniq
 into two json files (botVisits.json and visitorsByCip.json). Takes three arguements- year, month, and day.
 Year must be 4 chars, while month and day are 2 chars. 
 
-```bash
+```sh
 node filterFolder.js 2021 02 17
 ```
