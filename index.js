@@ -1,6 +1,4 @@
 const AWS = require("aws-sdk");
-const fs = require("fs");
-const p = require("path");
 const zlib = require("zlib");
 require("dotenv").config();
 const format = require("./formatAndPlace");
@@ -16,7 +14,7 @@ const s3 = new AWS.S3({
 function getBucketLogs() {
   const listParams = {
     Bucket: "tailswaglogs",
-    MaxKeys: 1, //temp small num for tests, change later to grab all files
+    MaxKeys: 4, //temp small num for tests, change later to grab all files
   };
   const keys = [];
 
@@ -43,9 +41,9 @@ function getBucketLogs() {
       if (err) console.log("IM AN ERROR", err);
       if (data) {
         try {
-          let str = data.ETag; //make a new file name
+          let str = data.ETag.substr(1, data.ETag.length - 2); //make a new file name
           //unzip the Buffer data
-          zlib.unzip(data.Body, function (err, result) {
+          zlib.unzip(data.Body, async function (err, result) {
             if (err) {
               //TODO: add logic to retry unzip rather than return
               console.error(err);
@@ -54,9 +52,8 @@ function getBucketLogs() {
             if (result) {
               //format buffer here, write as JSON
               //convertCondense one at a time
-              let formattedJson = format.formatSingleFile(result);
-              console.log("before placing: ", formattedJson);
-              format.placeFormattedJson(formattedJson, str);
+              let formattedJson = await format.formatSingleFile(result);
+              await format.placeFormattedJson(formattedJson, str);
             }
           });
         } catch (error) {

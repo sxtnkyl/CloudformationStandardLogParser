@@ -24,6 +24,7 @@ function checkArgs() {
     process.exit(1);
   }
 }
+checkArgs();
 
 const year = process.argv[2];
 const month = process.argv[3];
@@ -42,46 +43,47 @@ fs.readdir(filepath, (err, files) => {
     console.log("no files are in this folder");
     process.exit(1);
   } else {
-    function filterJsonFiles() {
-      files.filter((file) => {
-        if (p.extname(file).toLowerCase() === ".json") {
-          //dont include compiled files
-          if (file == "visitorsByCip.json" || file == "botVisits.json") {
-            return;
-          } else filesNames.push(file);
-        }
-      });
-    }
-    //go through file list, sort each key/value pair into either people or bot obj, write to file
-    function filterFolder() {
-      filesNames.forEach((file) => {
-        const currentFile = `${filepath}/${file}`;
-        function filterFile(file) {
-          const currentJson = JSON.parse(fs.readFileSync(file));
-          for (let key in currentJson) {
-            //bot detector, has string 'bot' somewhere in cs(User-Agent) key
-            let hasBot = currentJson[key][0]["cs(User-Agent)"]
-              .toLowerCase()
-              .includes("bot");
-            if (hasBot) {
-              !botsJSON.hasOwnProperty(key)
-                ? (botsJSON[key] = currentJson[key])
-                : (botsJSON[key] = botsJSON[key].concat(currentJson[key]));
-            }
-            if (!hasBot) {
-              !peopleJSON.hasOwnProperty(key)
-                ? (peopleJSON[key] = currentJson[key])
-                : (peopleJSON[key] = peopleJSON[key].concat(currentJson[key]));
-            }
-          }
-        }
-        filterFile(currentFile);
-      });
-
-      fs.writeFileSync(peoplePath, JSON.stringify(peopleJSON));
-      fs.writeFileSync(botPath, JSON.stringify(botsJSON));
-    }
     filterJsonFiles();
     filterFolder();
+  }
+
+  function filterJsonFiles() {
+    files.filter((file) => {
+      if (p.extname(file).toLowerCase() === ".json") {
+        //dont include compiled files
+        if (file == "visitorsByCip.json" || file == "botVisits.json") {
+          return;
+        } else filesNames.push(file);
+      }
+    });
+  }
+  //go through file list, sort each key/value pair into either people or bot obj, write to file
+  function filterFolder() {
+    filesNames.forEach((file) => {
+      const currentFile = `${filepath}/${file}`;
+      function filterFile(file) {
+        const currentJson = JSON.parse(fs.readFileSync(file));
+        for (let key in currentJson) {
+          //bot detector, has string 'bot' somewhere in cs(User-Agent) key
+          let hasBot = currentJson[key][0]["cs(User-Agent)"]
+            .toLowerCase()
+            .includes("bot");
+          if (hasBot) {
+            !botsJSON.hasOwnProperty(key)
+              ? (botsJSON[key] = currentJson[key])
+              : (botsJSON[key] = botsJSON[key].concat(currentJson[key]));
+          }
+          if (!hasBot) {
+            !peopleJSON.hasOwnProperty(key)
+              ? (peopleJSON[key] = currentJson[key])
+              : (peopleJSON[key] = peopleJSON[key].concat(currentJson[key]));
+          }
+        }
+      }
+      filterFile(currentFile);
+    });
+
+    fs.writeFileSync(peoplePath, JSON.stringify(peopleJSON));
+    fs.writeFileSync(botPath, JSON.stringify(botsJSON));
   }
 });
