@@ -61,29 +61,30 @@ fs.readdir(filepath, (err, files) => {
   function filterFolder() {
     filesNames.forEach((file) => {
       const currentFile = `${filepath}/${file}`;
-      function filterFile(file) {
-        const currentJson = JSON.parse(fs.readFileSync(file));
-        for (let key in currentJson) {
-          //bot detector, has string 'bot' somewhere in cs(User-Agent) key
-          let hasBot = currentJson[key][0]["cs(User-Agent)"]
-            .toLowerCase()
-            .includes("bot");
-          if (hasBot) {
-            !botsJSON.hasOwnProperty(key)
-              ? (botsJSON[key] = currentJson[key])
-              : (botsJSON[key] = botsJSON[key].concat(currentJson[key]));
-          }
-          if (!hasBot) {
-            !peopleJSON.hasOwnProperty(key)
-              ? (peopleJSON[key] = currentJson[key])
-              : (peopleJSON[key] = peopleJSON[key].concat(currentJson[key]));
-          }
-        }
-      }
       filterFile(currentFile);
     });
 
     fs.writeFileSync(peoplePath, JSON.stringify(peopleJSON));
     fs.writeFileSync(botPath, JSON.stringify(botsJSON));
+
+    function filterFile(file) {
+      const currentJson = JSON.parse(fs.readFileSync(file));
+      for (let key in currentJson) {
+        //bot detector, has string 'bot' somewhere in cs(User-Agent) key
+        let hasBot = currentJson[key][0]["cs(User-Agent)"]
+          .toLowerCase()
+          .includes("bot");
+        if (hasBot) {
+          !botsJSON.hasOwnProperty(key)
+            ? (botsJSON[key] = currentJson[key])
+            : (botsJSON[key] = botsJSON[key].concat(currentJson[key]));
+        }
+        if (!hasBot) {
+          !peopleJSON.hasOwnProperty(key)
+            ? (peopleJSON[key] = currentJson[key])
+            : (peopleJSON[key] = peopleJSON[key].concat(currentJson[key]));
+        }
+      }
+    }
   }
 });

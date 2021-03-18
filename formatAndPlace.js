@@ -2,9 +2,10 @@ const fs = require("fs");
 const rl = require("readline");
 const stream = require("stream");
 const p = require("path");
-// Cloudfront
+
 //https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#BasicDistributionFileFormat
 // Fields: date time x-edge-location sc-bytes c-ip cs-method cs(Host) cs-uri-stem sc-status cs(Referer) cs(User-Agent) cs-uri-query cs(Cookie) x-edge-result-type x-edge-request-id x-host-header cs-protocol cs-bytes time-taken x-forwarded-for ssl-protocol ssl-cipher x-edge-response-result-type cs-protocol-version fle-status fle-encrypted-fields c-port time-to-first-byte x-edge-detailed-result-type sc-content-type sc-content-len sc-range-start sc-range-end
+
 //no data is logged as -
 //TODO- convert url encoded values
 var header = [
@@ -43,7 +44,6 @@ var header = [
   "sc-range-end",
 ];
 
-//https://stackoverflow.com/questions/54468349/node-js-how-to-store-readline-answer-in-a-variable
 //takes Buffer, makes an array of lines(str), parse the strings, return usable JSON
 async function formatSingleFile(data) {
   let lineArray = [];
@@ -53,6 +53,7 @@ async function formatSingleFile(data) {
 
   return makeJson(objects);
 
+  //reads buffer, makes array of lines
   async function processLines(buff) {
     const buffStream = new stream.PassThrough();
     buffStream.end(buff);
@@ -94,7 +95,7 @@ async function formatSingleFile(data) {
 
     return null;
   }
-  //takes array of objects, transforms into json object
+  //takes array of objects, transforms into json object by c-ip
   function makeJson(objects) {
     let newJSON = {};
     objects.forEach((obj) => {
@@ -114,7 +115,6 @@ async function placeFormattedJson(json, filename) {
   let keys = Object.keys(json);
   //get first date in a json- all dates in a single file are the same
   let date = json[keys[0]][0].date;
-  //date.parse -> format
   let year, day, month; //example date: '2021-05-21'
   year = date.substr(0, 4);
   month = date.substr(5, 2);
