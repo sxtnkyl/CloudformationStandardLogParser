@@ -3,7 +3,8 @@
 * Add additional arg to delete logs downloaded
 * Add arg to auto filterFolder
 * Add arg to change key to sort objects by (rather than c-ip)
-* Tweak filterFolder to sort all folders within a year or month folder
+x Tweak filterFolder to sort all folders within a month folder
+* backcheck arg to make sure year entered is a valid folder
 
 ### Maybe
 
