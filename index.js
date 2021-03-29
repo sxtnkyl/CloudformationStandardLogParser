@@ -15,7 +15,7 @@ const s3 = new AWS.S3({
 function getBucketLogs() {
   const listParams = {
     Bucket: process.env.BUCKET,
-    MaxKeys: keyAmount ? keyAmount : 957, //temp small num for tests, change later to grab all files
+    MaxKeys: keyAmount ? keyAmount : 4, //temp small num for tests, change later to grab all files
   };
   const keys = [];
 
